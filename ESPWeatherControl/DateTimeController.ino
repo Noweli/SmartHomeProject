@@ -1,6 +1,7 @@
 void SetUpDateTime()
 {
-    DateTime.setTimeZone(8);
+    DateTime.setServer("ntp1.tp.pl");
+    DateTime.setTimeZone(2);
     DateTime.begin();
     if (!DateTime.isTimeValid())
     {
@@ -8,6 +9,14 @@ void SetUpDateTime()
     }
     else
     {
-        soundDetectionDate = DateTime.now();
+        Serial.print("DateTime.now(): ");
+        Serial.println(DateTime.now());
+        Serial.print("DateTime.getTime(): ");
+        Serial.println(DateTime.getTime());
+        Serial.print("DateTime.utcTime(): ");
+        Serial.println(DateTime.utcTime());
+        Serial.print("DateTime.getTimeZone(): ");
+        Serial.println(DateTime.getTimeZone());
+        soundDetectionDate = DateTime.format(DateFormatter::HTTP);
     }
 }

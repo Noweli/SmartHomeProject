@@ -15,10 +15,7 @@ void Handle_HumidityRequest()
 
 void Handle_SoundSensorRequest()
 {
-  String data;
-  data += "Last sound detection: ";
-  data += soundDetectionDate;
-  server.send(200, "text/html", WrapDataInBody(data));
+  server.send(200, "text/html", WrapDataInBody(soundDetectionDate));
 }
 
 void Handle_NotFound()
