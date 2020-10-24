@@ -3,67 +3,100 @@
 #include <WiFiManager.h>
 #include "DHT.h"
 
-#define DHTTYPE DHT11   // DHT 11
+#define DHTTYPE DHT11
 
-
+uint8_t DHTPin = D6;
 
 ESP8266WebServer server(80);
-
-// DHT Sensor
-uint8_t DHTPin = D8; 
-               
-// Initialize DHT sensor.
-DHT dht(DHTPin, DHTTYPE);                
-
-float Temperature;
-float Humidity;
+DHT dht(DHTPin, DHTTYPE);
  
 void setup() {
+  //Serial communication setup for logs
   Serial.begin(9600);
   delay(100);
-  
-  pinMode(DHTPin, INPUT);
 
+  //Enable DHT sensor
+  pinMode(DHTPin, INPUT);
   dht.begin();              
 
+  //Used for WiFi connection
+  //If ESP cannot connect using saved connections then is switches to Access Point
+  //Default IP for configuration is 192.168.4.1
   WiFiManager wifiManager;
   wifiManager.autoConnect("Module1-ESP");
 
-  //check wi-fi is connected to wi-fi network
+  //Loop as long as WiFi is not connected
+  WaitForConnection();
+  GetConnectionData();
+  SetUpServer();
+
+}
+
+void loop() {
+  server.handleClient();
+}
+
+void WaitForConnection(){
   while (WiFi.status() != WL_CONNECTED) {
-  delay(1000);
-  Serial.print(".");
+    delay(1000);
+    Serial.print(".");
   }
-  Serial.println("");
-  Serial.println("WiFi connected..!");
-  Serial.print("Got IP: ");  Serial.println(WiFi.localIP());
+}
 
-  server.on("/", handle_OnConnect);
-  server.onNotFound(handle_NotFound);
+String GetConnectionData(){
+  String data;
 
+  data += "\n";
+  data += "Connected to WiFi network\n";
+  data += "Local ip: ";
+  data += WiFi.localIP().toString();
+  data += "\n";
+
+  return data;
+}
+
+void SetUpServer(){
+  server.on("/", Handle_MainSite);
+  server.on("/temperature", Handle_TemperatureRequest);
+  server.on("/humidity", Handle_HumidityRequest);
+  server.onNotFound(Handle_NotFound);
+  
   server.begin();
   Serial.println("HTTP server started");
-
-}
-void loop() {
-  
-  server.handleClient();
-  
 }
 
-void handle_OnConnect() {
-
-  Temperature = dht.readTemperature(); // Gets the values of the temperature
-  Humidity = dht.readHumidity(); // Gets the values of the humidity 
-  server.send(200, "text/html", SendHTML(Temperature,Humidity)); 
+void Handle_MainSite(){
+  server.send(200, "text/html", WrapDataInBody("Currently available:</br>/temperature</br>/humidity"));
 }
 
-void handle_NotFound(){
+void Handle_TemperatureRequest() {
+  server.send(200, "text/html", SendHTMLWithSensorData((float)dht.readTemperature())); 
+}
+
+void Handle_HumidityRequest() {
+  server.send(200, "text/html", SendHTMLWithSensorData((float)dht.readHumidity())); 
+}
+
+void Handle_NotFound(){
   server.send(404, "text/plain", "Not found");
 }
 
-String SendHTML(float Temperaturestat,float Humiditystat){
-  String ptr = "<!DOCTYPE html> <html>\n";
-  ptr +="<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
-  return ptr;
+String SendHTMLWithSensorData(float sensorData){
+  Serial.println("SendHTMLWithSensorData method called");
+  return WrapDataInBody(String(sensorData));
+}
+
+String WrapDataInBody(String data){
+  Serial.print("WrapDataInBody method called with following data - ");
+  Serial.println(data);
+  
+  String site = "<!DOCTYPE html> <html>\n";
+  site +="<head>\n";
+  site +="<body>\n";
+  site += data;
+  site +="\n</body>";
+  site +="</head>\n";
+  site +="</html>\n";
+
+  return site;
 }
