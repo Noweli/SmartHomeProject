@@ -5,12 +5,14 @@ void Handle_MainSite()
 
 void Handle_TemperatureRequest()
 {
-  server.send(200, "text/html", SendHTMLWithSensorData((float)dht.readTemperature()));
+  temperature = (float)dht.readTemperature();
+  server.send(200, "text/html", SendHTMLWithSensorData(temperature));
 }
 
 void Handle_HumidityRequest()
 {
-  server.send(200, "text/html", SendHTMLWithSensorData((float)dht.readHumidity()));
+  humidity = (float)dht.readHumidity();
+  server.send(200, "text/html", SendHTMLWithSensorData(humidity));
 }
 
 void Handle_SoundSensorRequest()

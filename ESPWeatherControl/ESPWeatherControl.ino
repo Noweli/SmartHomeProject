@@ -7,7 +7,10 @@
 #define DHTTYPE DHT11
 
 String soundDetectionDate;
+float temperature = 0;
+float humidity = 0;
 
+uint8_t HeaterPin = D5;
 uint8_t DHTPin = D6;
 uint8_t SoundSensorPin = D7;
 
@@ -20,6 +23,7 @@ void setup()
   Serial.begin(9600);
   delay(100);
 
+  pinMode(HeaterPin, OUTPUT);
   pinMode(DHTPin, INPUT);
   pinMode(SoundSensorPin, INPUT);
 
@@ -43,4 +47,5 @@ void loop()
   server.handleClient();
 
   CheckForSoundDetection();
+  ControllTemperature();
 }
