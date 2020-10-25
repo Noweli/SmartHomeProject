@@ -1,6 +1,6 @@
 void Handle_MainSite()
 {
-  server.send(200, "text/html", WrapDataInBody("Currently available:</br>/temperature</br>/humidity<br>/sound"));
+  server.send(200, "text/html", WrapDataInBody("Currently available:</br>/temperature</br>/humidity<br>/sound<br>/light"));
 }
 
 void Handle_TemperatureRequest()
@@ -18,6 +18,11 @@ void Handle_HumidityRequest()
 void Handle_SoundSensorRequest()
 {
   server.send(200, "text/html", WrapDataInBody(soundDetectionDate));
+}
+
+void Handle_LightSensorRequest()
+{
+  server.send(200, "text/html", SendHTMLWithSensorData(lightSensor.readLightLevel(true)));
 }
 
 void Handle_NotFound()
