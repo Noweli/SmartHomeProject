@@ -6,23 +6,23 @@ void Handle_MainSite()
 void Handle_TemperatureRequest()
 {
   temperature = (float)dht.readTemperature();
-  server.send(200, "text/html", SendHTMLWithSensorData(temperature));
+  server.send(200, "application/json", SendJSONWithSensorData("temperature", temperature));
 }
 
 void Handle_HumidityRequest()
 {
   humidity = (float)dht.readHumidity();
-  server.send(200, "text/html", SendHTMLWithSensorData(humidity));
-}
-
-void Handle_SoundSensorRequest()
-{
-  server.send(200, "text/html", WrapDataInBody(soundDetectionDate));
+  server.send(200, "application/json", SendJSONWithSensorData("humidity", humidity));
 }
 
 void Handle_LightSensorRequest()
 {
-  server.send(200, "text/html", SendHTMLWithSensorData(lightSensor.readLightLevel(true)));
+  server.send(200, "application/json", SendJSONWithSensorData("light", lightSensor.readLightLevel(true)));
+}
+
+void Handle_SoundSensorRequest()
+{
+  server.send(200, "application/json", WrapDataInJSON("lastDetectionDate", soundDetectionDate));
 }
 
 void Handle_NotFound()
