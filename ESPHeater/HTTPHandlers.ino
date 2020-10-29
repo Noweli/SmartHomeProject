@@ -6,8 +6,7 @@ void Handle_MainSite()
 void Handle_TurnOnHeater()
 {
   Serial.println("Received request to turn on heater");
-  // digitalWrite(HeaterPin, HIGH); //commented only for buzzer, in case of heater uncomment!
-  tone(HeaterPin, 523);
+  digitalWrite(HeaterPin, HIGH);
   server.send(200, "text/html", WrapDataInBody("Heater turned on"));
 }
 

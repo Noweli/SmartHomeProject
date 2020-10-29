@@ -12,6 +12,7 @@ void setup()
   delay(100);
 
   pinMode(HeaterPin, OUTPUT);
+  digitalWrite(HeaterPin, LOW);
 
   //Used for WiFi connection
   //If ESP cannot connect using saved connections then is switches to Access Point
