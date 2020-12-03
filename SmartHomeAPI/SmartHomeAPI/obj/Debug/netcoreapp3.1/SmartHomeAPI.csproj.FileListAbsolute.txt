@@ -59,3 +59,11 @@ D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\obj\Debug\netcoreapp3.1\
 D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\obj\Debug\netcoreapp3.1\SmartHomeAPI.dll
 D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\obj\Debug\netcoreapp3.1\SmartHomeAPI.pdb
 D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\obj\Debug\netcoreapp3.1\SmartHomeAPI.genruntimeconfig.cache
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Logging.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Protocols.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Tokens.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\System.IdentityModel.Tokens.Jwt.dll
