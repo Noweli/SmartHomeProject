@@ -10,6 +10,8 @@ namespace SmartHomeAPI.Helpers
     {
         private readonly HttpClient _httpClient = new HttpClient();
 
+        public string GetHttpUrl(string ip) => $"http://{ip}";
+
         public JObject GetJsonData(string url, SensorRequestType requestType)
         {
             var response = SendSensorRequest(url, requestType).Result;

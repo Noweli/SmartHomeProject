@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,16 +17,30 @@ namespace SmartHomeAPI.Controllers
         private readonly HttpClient _httpClient = new HttpClient();
         
         [Authorize]
-        [HttpGet("temperature")]
+        [HttpGet("sensor/temperature")]
         public ActionResult<WeatherDTO> GetTemperature()
         {
             var temperature = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Temperature)["temperature"].ToString());
             var humidity = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Humidity)["humidity"].ToString());
-            
+
             return new WeatherDTO
             {
                 Temperature = temperature,
                 Humidity = humidity
+            };
+        }
+        
+        [Authorize]
+        [HttpGet("sensor/additional")]
+        public ActionResult<AdditionalInfoDTO> GetHumidity()
+        {
+            var light = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Light)["light"].ToString());
+            var soundDate = _sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Sound)["lastDetectionDate"].ToString();
+
+            return new AdditionalInfoDTO
+            {
+                Light = light,
+                SoundDate = soundDate
             };
         }
 
