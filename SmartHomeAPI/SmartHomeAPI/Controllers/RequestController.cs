@@ -5,20 +5,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SmartHomeAPI.DTOs;
+using SmartHomeAPI.Enums;
+using SmartHomeAPI.Helpers;
 
 namespace SmartHomeAPI.Controllers
 {
     public class RequestController : BaseApiController
     {
+        private readonly SensorRequestHelper _sensorRequestHelper = new SensorRequestHelper();
         private readonly HttpClient _httpClient = new HttpClient();
         
         [Authorize]
         [HttpGet("temperature")]
-        public async Task<ActionResult<WeatherDTO>> GetTemperature()
+        public ActionResult<WeatherDTO> GetTemperature()
         {
-            decimal temperature = 
-                decimal.Parse(JObject.Parse(_httpClient.GetStringAsync("http://192.168.0.143/temperature").Result)["temperature"].ToString());
-            decimal humidity = decimal.Parse(JObject.Parse(_httpClient.GetStringAsync("http://192.168.0.143/humidity").Result)["humidity"].ToString());
+            var temperature = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Temperature)["temperature"].ToString());
+            var humidity = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Humidity)["humidity"].ToString());
+            
             return new WeatherDTO
             {
                 Temperature = temperature,
