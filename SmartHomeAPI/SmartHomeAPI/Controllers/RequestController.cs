@@ -16,9 +16,9 @@ namespace SmartHomeAPI.Controllers
         [HttpGet("temperature")]
         public async Task<ActionResult<WeatherDTO>> GetTemperature()
         {
-            decimal temperature =
-                decimal.Parse(JObject.Parse(_httpClient.GetStringAsync("http://192.168.0.144/temperature").Result)["temperature"].ToString());
-            decimal humidity = decimal.Parse(JObject.Parse(_httpClient.GetStringAsync("http://192.168.0.144/humidity").Result)["humidity"].ToString());
+            decimal temperature = 
+                decimal.Parse(JObject.Parse(_httpClient.GetStringAsync("http://192.168.0.143/temperature").Result)["temperature"].ToString());
+            decimal humidity = decimal.Parse(JObject.Parse(_httpClient.GetStringAsync("http://192.168.0.143/humidity").Result)["humidity"].ToString());
             return new WeatherDTO
             {
                 Temperature = temperature,
