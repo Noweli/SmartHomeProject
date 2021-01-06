@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +16,94 @@ namespace SmartHomeAPI.Controllers
         public RoomController(DataContext context)
         {
             _context = context;
+        }
+
+        [Authorize]
+        [HttpGet("getRooms")]
+        public ActionResult<RoomDTO[]> Add()
+        {
+            RoomDTO[] rooms = _context.GetUserRooms(User.GetCurrentUser()).Select(r => new RoomDTO
+            {
+                Name = r.Name,
+                HeaterIp = r.HeaterIP,
+                SensorIp = r.SensorsIP,
+                AutoHeatEnabled = r.AutoHeatEnabled,
+                Interval = r.Interval,
+                MaxTemp = r.MaxTemp,
+                MinTemp = r.MinTemp
+            }).ToArray();
+
+            return rooms;
+        }
+        
+        [Authorize]
+        [HttpGet("setHeater")]
+        public ActionResult<RoomDTO> SetHeaterConfiguration(string roomName, int? minTemperature, int? maxTemperature, int? interval)
+        {
+            if (string.IsNullOrEmpty(roomName) || minTemperature == null || maxTemperature == null || interval == null)
+            {
+                return BadRequest("Parameters provided incorrectly! name=[roomName]&minTemperature=[number]&maxTemperature=[number]&interval=[number]");
+            }
+            
+            var roomId = _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
+            
+            if (roomId == -1)
+            {
+                return BadRequest("Room with such name already exists!");
+            }
+
+            var room = _context.GetRoomBasedOnId(roomId);
+            room.MaxTemp = maxTemperature.Value;
+            room.MinTemp = minTemperature.Value;
+            room.Interval = interval.Value;
+
+            _context.Rooms.Update(room);
+            _context.SaveChangesAsync();
+
+            return new RoomDTO
+            {
+                Name = room.Name,
+                Interval = room.Interval,
+                MaxTemp = room.MaxTemp,
+                MinTemp = room.MinTemp,
+                AutoHeatEnabled = room.AutoHeatEnabled,
+                HeaterIp = room.HeaterIP,
+                SensorIp = room.SensorsIP
+            };
+        }
+        
+        [Authorize]
+        [HttpGet("enableAutoHeater")]
+        public ActionResult<RoomDTO> Add(string roomName, bool enabled)
+        {
+            if (string.IsNullOrEmpty(roomName))
+            {
+                return BadRequest("Parameters provided incorrectly! name=[roomName]");
+            }
+            
+            var roomId = _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
+            
+            if (roomId == -1)
+            {
+                return BadRequest("Room with such name already exists!");
+            }
+            
+            var room = _context.GetRoomBasedOnId(roomId);
+            room.AutoHeatEnabled = enabled;
+
+            _context.Rooms.Update(room);
+            _context.SaveChangesAsync();
+
+            return new RoomDTO
+            {
+                Name = room.Name,
+                Interval = room.Interval,
+                MaxTemp = room.MaxTemp,
+                MinTemp = room.MinTemp,
+                AutoHeatEnabled = room.AutoHeatEnabled,
+                HeaterIp = room.HeaterIP,
+                SensorIp = room.SensorsIP
+            };
         }
         
         [Authorize]

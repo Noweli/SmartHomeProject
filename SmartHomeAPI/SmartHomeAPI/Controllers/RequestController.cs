@@ -27,7 +27,7 @@ namespace SmartHomeAPI.Controllers
         [HttpGet("sensor/temperature/{room}")]
         public ActionResult<WeatherDTO> GetTemperature(string room)
         {
-            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
 
             if (string.IsNullOrEmpty(roomIp))
             {
@@ -48,7 +48,7 @@ namespace SmartHomeAPI.Controllers
         [HttpGet("sensor/additional/{room}")]
         public ActionResult<AdditionalInfoDTO> GetAdditional(string room)
         {
-            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
             
             if (string.IsNullOrEmpty(roomIp))
             {
@@ -69,7 +69,7 @@ namespace SmartHomeAPI.Controllers
         [HttpGet("heater/on/{room}")]
         public async Task<ActionResult> TurnOnHeater(string room)
         {
-            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
             
             if (string.IsNullOrEmpty(roomIp))
             {
@@ -98,7 +98,7 @@ namespace SmartHomeAPI.Controllers
         [HttpGet("heater/off/{room}")]
         public async Task<ActionResult> TurnOffHeater(string room)
         {
-            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
             
             if (string.IsNullOrEmpty(roomIp))
             {
