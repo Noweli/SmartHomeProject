@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using SmartHomeAPI.Data;
 using SmartHomeAPI.DTOs;
 using SmartHomeAPI.Enums;
 using SmartHomeAPI.Helpers;
@@ -15,13 +16,26 @@ namespace SmartHomeAPI.Controllers
     {
         private readonly SensorRequestHelper _sensorRequestHelper = new SensorRequestHelper();
         private readonly HttpClient _httpClient = new HttpClient();
+        private readonly DataContext _context;
+
+        public RequestController(DataContext context)
+        {
+            _context = context;
+        }
         
         [Authorize]
-        [HttpGet("sensor/temperature")]
-        public ActionResult<WeatherDTO> GetTemperature()
+        [HttpGet("sensor/temperature/{room}")]
+        public ActionResult<WeatherDTO> GetTemperature(string room)
         {
-            var temperature = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Temperature)["temperature"].ToString());
-            var humidity = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Humidity)["humidity"].ToString());
+            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+
+            if (string.IsNullOrEmpty(roomIp))
+            {
+                return BadRequest("Room with such name doesn't exists!");
+            }
+            
+            var temperature = decimal.Parse(_sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp), SensorRequestType.Temperature)["temperature"].ToString());
+            var humidity = decimal.Parse(_sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp), SensorRequestType.Humidity)["humidity"].ToString());
 
             return new WeatherDTO
             {
@@ -31,11 +45,18 @@ namespace SmartHomeAPI.Controllers
         }
         
         [Authorize]
-        [HttpGet("sensor/additional")]
-        public ActionResult<AdditionalInfoDTO> GetHumidity()
+        [HttpGet("sensor/additional/{room}")]
+        public ActionResult<AdditionalInfoDTO> GetAdditional(string room)
         {
-            var light = decimal.Parse(_sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Light)["light"].ToString());
-            var soundDate = _sensorRequestHelper.GetJsonData("http://192.168.0.143", SensorRequestType.Sound)["lastDetectionDate"].ToString();
+            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+            
+            if (string.IsNullOrEmpty(roomIp))
+            {
+                return BadRequest("Room with such name doesn't exists!");
+            }
+            
+            var light = decimal.Parse(_sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp), SensorRequestType.Light)["light"].ToString());
+            var soundDate = _sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp), SensorRequestType.Sound)["lastDetectionDate"].ToString();
 
             return new AdditionalInfoDTO
             {
