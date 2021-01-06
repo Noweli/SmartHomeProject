@@ -66,13 +66,20 @@ namespace SmartHomeAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("heater/on")]
-        public async Task<ActionResult> TurnOnHeater()
+        [HttpGet("heater/on/{room}")]
+        public async Task<ActionResult> TurnOnHeater(string room)
         {
+            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+            
+            if (string.IsNullOrEmpty(roomIp))
+            {
+                return BadRequest("Room with such name doesn't exists or heater IP was not provided during room configuration!");
+            }
+            
             _httpClient.Timeout = TimeSpan.FromSeconds(3);
             try
             {
-                var response = await _httpClient.GetAsync("http://192.168.0.94/turnOn");
+                var response = await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(roomIp)}/turnOn");
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -88,13 +95,20 @@ namespace SmartHomeAPI.Controllers
         }
         
         [Authorize]
-        [HttpGet("heater/off")]
-        public async Task<ActionResult> TurnOffHeater()
+        [HttpGet("heater/off/{room}")]
+        public async Task<ActionResult> TurnOffHeater(string room)
         {
+            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomBasedOnName(User.GetCurrentUser(), room));
+            
+            if (string.IsNullOrEmpty(roomIp))
+            {
+                return BadRequest("Room with such name doesn't exists or heater IP was not provided during room configuration!");
+            }
+            
             _httpClient.Timeout = TimeSpan.FromSeconds(3);
             try
             {
-                var response = await _httpClient.GetAsync("http://192.168.0.94/turnOff");
+                var response = await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(roomIp)}/turnOff");
                 
                 if (response.IsSuccessStatusCode)
                 {
