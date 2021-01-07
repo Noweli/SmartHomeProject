@@ -17,6 +17,7 @@ namespace SmartHomeAPI.Extensions
             {
                 options.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
             });
+            
         }
     }
 }
