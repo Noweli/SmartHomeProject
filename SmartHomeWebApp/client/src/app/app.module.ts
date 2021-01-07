@@ -11,6 +11,7 @@ import { RegisterComponent } from './register/register.component';
 import { SharedModule } from './_modules/shared.module';
 import { HomeComponent } from './home/home.component';
 import { RoomsComponent } from './rooms/rooms.component';
+import { AddRoomComponent } from './add-room/add-room.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { RoomsComponent } from './rooms/rooms.component';
     NavComponent,
     RegisterComponent,
     RoomsComponent,
-    HomeComponent
+    HomeComponent,
+    AddRoomComponent
   ],
   imports: [
     BrowserModule,

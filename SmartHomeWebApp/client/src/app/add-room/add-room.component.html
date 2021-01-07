@@ -1,0 +1,15 @@
+<form #addRoomForm="ngForm" (ngSubmit)="addRoom()" autocomplete="off">
+    <h2 class="text-center text-primary float-left">Add new room</h2><br/><br/>
+    <div class="form-group row">
+        <div class="col-xs-4">
+            <input type="text" class="form-control" name="roomName" [(ngModel)]="room.name" placeholder="Room name">
+            <input type="text" class="form-control" name="roomSensorIp" [(ngModel)]="room.sensorIp"
+                placeholder="Room sensor IP">
+            <input type="text" class="form-control" name="heaterIp" [(ngModel)]="room.heaterIp" placeholder="Heater IP">
+        </div>
+    </div>
+    <div class="form-group text-center container-sm float-left">
+        <button class="btn btn-success mr-2" type="submit">Add room</button>
+        <button class="btn btn-default mr-2" type="button" (click)="cancel()">Cancel</button>
+    </div>
+</form>
