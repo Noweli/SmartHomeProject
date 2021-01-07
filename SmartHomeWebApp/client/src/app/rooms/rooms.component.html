@@ -1,0 +1,16 @@
+<ul>
+    <li *ngFor="let room of rooms"><h3 style="display: inline;">{{room.name}}</h3>
+        <br/><p style="font-size: 12px"><i>Temperature: {{room.temperature}}°C  Humidity: {{room.humidity}}%  Auto heating enabled: {{room.autoHeatEnabled}}</i></p>
+        <button class="btn btn-success" type="button">Edit</button>
+        <button class="btn btn-success ml-2" type="button" (click)="toggleHeater(room, true)">Turn on heater</button>
+        <button class="btn btn-success ml-2" type="button" (click)="toggleHeater(room, false)">Turn off heater</button>
+        <button class="btn btn-success ml-2" type="button" (click) ="toggleAutoHeater(room)" >{{getHeaterButtonText(room)}}</button>
+        <br/><br/><br/>
+    </li>
+    <div class="container float-left" *ngIf="!addingNewRoom">
+        <button class="btn btn-info" (click)="toggleAddingMode()">Add new room</button>
+    </div>
+    <div class="container float-left" *ngIf="addingNewRoom">
+        <app-add-room (cancelAdding)="cancelAddingMode($event)"></app-add-room>
+    </div>
+</ul>

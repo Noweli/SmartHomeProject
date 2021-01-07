@@ -10,13 +10,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RegisterComponent } from './register/register.component';
 import { SharedModule } from './_modules/shared.module';
 import { HomeComponent } from './home/home.component';
+import { RoomsComponent } from './rooms/rooms.component';
+import { AddRoomComponent } from './add-room/add-room.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavComponent,
     RegisterComponent,
-    HomeComponent
+    RoomsComponent,
+    HomeComponent,
+    AddRoomComponent
   ],
   imports: [
     BrowserModule,

@@ -20,7 +20,7 @@ namespace SmartHomeAPI.Controllers
 
         [Authorize]
         [HttpGet("getRooms")]
-        public ActionResult<RoomDTO[]> Add()
+        public ActionResult<RoomDTO[]> GetRooms()
         {
             RoomDTO[] rooms = _context.GetUserRooms(User.GetCurrentUser()).Select(r => new RoomDTO
             {

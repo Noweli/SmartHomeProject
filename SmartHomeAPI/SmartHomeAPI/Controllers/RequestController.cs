@@ -27,15 +27,28 @@ namespace SmartHomeAPI.Controllers
         [HttpGet("sensor/temperature/{room}")]
         public ActionResult<WeatherDTO> GetTemperature(string room)
         {
+            var temperature = decimal.MinusOne;
+            var humidity = decimal.MinusOne;
             var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
 
             if (string.IsNullOrEmpty(roomIp))
             {
                 return BadRequest("Room with such name doesn't exists!");
             }
-            
-            var temperature = decimal.Parse(_sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp), SensorRequestType.Temperature)["temperature"].ToString());
-            var humidity = decimal.Parse(_sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp), SensorRequestType.Humidity)["humidity"].ToString());
+
+            try
+            {
+                temperature =
+                    decimal.Parse(_sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp),
+                        SensorRequestType.Temperature)["temperature"].ToString());
+                humidity =
+                    decimal.Parse(_sensorRequestHelper.GetJsonData(_sensorRequestHelper.GetHttpUrl(roomIp),
+                        SensorRequestType.Humidity)["humidity"].ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error occured while taking information about room with name {room}: {e.Message}");
+            }
 
             return new WeatherDTO
             {
