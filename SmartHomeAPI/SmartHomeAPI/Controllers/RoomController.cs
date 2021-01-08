@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,8 @@ namespace SmartHomeAPI.Controllers
                 AutoHeatEnabled = r.AutoHeatEnabled,
                 Interval = r.Interval,
                 MaxTemp = r.MaxTemp,
-                MinTemp = r.MinTemp
+                MinTemp = r.MinTemp,
+                HeaterEnabled = r.HeaterEnabled
             }).ToArray();
 
             return rooms;
@@ -38,14 +40,14 @@ namespace SmartHomeAPI.Controllers
         
         [Authorize]
         [HttpGet("setHeater")]
-        public ActionResult<RoomDTO> SetHeaterConfiguration(string roomName, int? minTemperature, int? maxTemperature, int? interval)
+        public async Task<ActionResult<RoomDTO>> SetHeaterConfiguration(string roomName, int? minTemperature, int? maxTemperature, int? interval)
         {
             if (string.IsNullOrEmpty(roomName) || minTemperature == null || maxTemperature == null || interval == null)
             {
                 return BadRequest("Parameters provided incorrectly! name=[roomName]&minTemperature=[number]&maxTemperature=[number]&interval=[number]");
             }
             
-            var roomId = _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
+            var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
             
             if (roomId == -1)
             {
@@ -58,7 +60,7 @@ namespace SmartHomeAPI.Controllers
             room.Interval = interval.Value;
 
             _context.Rooms.Update(room);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return new RoomDTO
             {
@@ -68,20 +70,21 @@ namespace SmartHomeAPI.Controllers
                 MinTemp = room.MinTemp,
                 AutoHeatEnabled = room.AutoHeatEnabled,
                 HeaterIp = room.HeaterIP,
-                SensorIp = room.SensorsIP
+                SensorIp = room.SensorsIP,
+                HeaterEnabled = room.HeaterEnabled
             };
         }
         
         [Authorize]
         [HttpGet("enableAutoHeater")]
-        public ActionResult<RoomDTO> Add(string roomName, bool enabled)
+        public async Task<ActionResult<RoomDTO>> Add(string roomName, bool enabled)
         {
             if (string.IsNullOrEmpty(roomName))
             {
                 return BadRequest("Parameters provided incorrectly! name=[roomName]");
             }
             
-            var roomId = _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
+            var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
             
             if (roomId == -1)
             {
@@ -92,7 +95,7 @@ namespace SmartHomeAPI.Controllers
             room.AutoHeatEnabled = enabled;
 
             _context.Rooms.Update(room);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return new RoomDTO
             {
@@ -102,7 +105,8 @@ namespace SmartHomeAPI.Controllers
                 MinTemp = room.MinTemp,
                 AutoHeatEnabled = room.AutoHeatEnabled,
                 HeaterIp = room.HeaterIP,
-                SensorIp = room.SensorsIP
+                SensorIp = room.SensorsIP,
+                HeaterEnabled = room.HeaterEnabled
             };
         }
         
@@ -127,6 +131,21 @@ namespace SmartHomeAPI.Controllers
             _context.SaveChangesAsync();
 
             return roomDto;
+        }
+        
+        [Authorize]
+        [HttpGet("checkHeater")]
+        public async Task<ActionResult<bool>> CheckHeater(string roomName)
+        {
+            var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
+            var room = _context.GetRoomBasedOnId(roomId);
+
+            if (room == null)
+            {
+                return BadRequest("Room with such name doesn't exists!");
+            }
+
+            return room.HeaterEnabled;
         }
 
         private bool CheckIfRoomExists(string roomName) => _context.Rooms

@@ -25,11 +25,12 @@ namespace SmartHomeAPI.Controllers
         
         [Authorize]
         [HttpGet("sensor/temperature/{room}")]
-        public ActionResult<WeatherDTO> GetTemperature(string room)
+        public async Task<ActionResult<WeatherDTO>> GetTemperature(string room)
         {
             var temperature = decimal.MinusOne;
             var humidity = decimal.MinusOne;
-            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
+            var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room);
+            var roomIp = _context.GetRoomSensorIp(roomId);
 
             if (string.IsNullOrEmpty(roomIp))
             {
@@ -59,9 +60,10 @@ namespace SmartHomeAPI.Controllers
         
         [Authorize]
         [HttpGet("sensor/additional/{room}")]
-        public ActionResult<AdditionalInfoDTO> GetAdditional(string room)
+        public async Task<ActionResult<AdditionalInfoDTO>> GetAdditional(string room)
         {
-            var roomIp = _context.GetRoomSensorIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
+            var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room);
+            var roomIp = _context.GetRoomSensorIp(roomId);
             
             if (string.IsNullOrEmpty(roomIp))
             {
@@ -79,23 +81,29 @@ namespace SmartHomeAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("heater/on/{room}")]
-        public async Task<ActionResult> TurnOnHeater(string room)
+        [HttpGet("heater/on/{name}")]
+        public async Task<ActionResult> TurnOnHeater(string name)
         {
-            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
-            
-            if (string.IsNullOrEmpty(roomIp))
+            var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), name);
+
+            if (roomId == -1)
             {
                 return BadRequest("Room with such name doesn't exists or heater IP was not provided during room configuration!");
             }
             
+            var room = _context.GetRoomBasedOnId(roomId);
+            
             _httpClient.Timeout = TimeSpan.FromSeconds(3);
             try
             {
-                var response = await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(roomIp)}/turnOn");
+                var response = await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(room.HeaterIP)}/turnOn");
                 
                 if (response.IsSuccessStatusCode)
                 {
+                    room.HeaterEnabled = true;
+                    _context.Rooms.Update(room);
+                    await _context.SaveChangesAsync();
+                    
                     return Ok("Heater turned on");
                 }
             }
@@ -108,23 +116,28 @@ namespace SmartHomeAPI.Controllers
         }
         
         [Authorize]
-        [HttpGet("heater/off/{room}")]
-        public async Task<ActionResult> TurnOffHeater(string room)
+        [HttpGet("heater/off/{name}")]
+        public async Task<ActionResult> TurnOffHeater(string name)
         {
-            var roomIp = _context.GetRoomHeaterIp(_context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), room));
-            
-            if (string.IsNullOrEmpty(roomIp))
+            var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), name);
+
+            if (roomId == -1)
             {
                 return BadRequest("Room with such name doesn't exists or heater IP was not provided during room configuration!");
             }
             
+            var room = _context.GetRoomBasedOnId(roomId);
+
             _httpClient.Timeout = TimeSpan.FromSeconds(3);
             try
             {
-                var response = await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(roomIp)}/turnOff");
+                var response = await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(room.HeaterIP)}/turnOff");
                 
                 if (response.IsSuccessStatusCode)
                 {
+                    room.HeaterEnabled = false;
+                    _context.Rooms.Update(room);
+                    await _context.SaveChangesAsync();
                     return Ok("Heater turned off");
                 }
             }

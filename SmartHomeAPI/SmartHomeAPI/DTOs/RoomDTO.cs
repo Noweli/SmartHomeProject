@@ -9,5 +9,6 @@
         public int MaxTemp { get; set; }
         public int Interval { get; set; }
         public bool AutoHeatEnabled { get; set; }
+        public bool HeaterEnabled { get; set; }
     }
 }

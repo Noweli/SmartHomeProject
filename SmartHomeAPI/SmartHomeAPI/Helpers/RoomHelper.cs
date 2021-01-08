@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SmartHomeAPI.Data;
 using SmartHomeAPI.Entity;
@@ -28,23 +29,23 @@ namespace SmartHomeAPI.Helpers
             return result.Select(r => r.Id).ToArray();
         }
         
-        public static int GetUserRoomIdBasedOnName(this DataContext dataContext, string userName, string roomName)
+        public static async Task<int> GetUserRoomIdBasedOnName(this DataContext dataContext, string userName, string roomName)
         {
             if (string.IsNullOrEmpty(roomName))
             {
                 return -1;
             }
             
-            var result = dataContext.Rooms
+            var result = await dataContext.Rooms
                 .FirstOrDefaultAsync(r => r.Name.ToLower() == roomName.ToLower() && r.AppUser == userName);
             
             if (result == null)
             {
-                result = dataContext.Rooms
+                result = await dataContext.Rooms
                     .FirstOrDefaultAsync(r => r.Name.ToLower().Contains(roomName.ToLower()) && r.AppUser == userName);
             }
 
-            return result?.Result.Id ?? -1;
+            return result?.Id ?? -1;
         }
         
         public static AppRoom GetRoomBasedOnId(this DataContext dataContext, int id)
@@ -54,7 +55,7 @@ namespace SmartHomeAPI.Helpers
 
         public static string GetRoomSensorIp(this DataContext dataContext, int id)
         {
-            return id == -1 ? string.Empty : dataContext.Rooms.FirstOrDefaultAsync(r => r.Id == id).Result.SensorsIP;
+            return id == -1 ? string.Empty : dataContext.Rooms.FirstOrDefaultAsync(r => r.Id == id).Result?.SensorsIP ?? string.Empty;
         }
         
         public static string GetRoomHeaterIp(this DataContext dataContext, int id)
