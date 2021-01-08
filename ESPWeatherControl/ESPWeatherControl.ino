@@ -1,5 +1,6 @@
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
 #include <WiFiManager.h>
 #include <ESPDateTime.h>
 #include <BH1750.h>
@@ -10,6 +11,11 @@
 #define DHTTYPE DHT11
 
 String soundDetectionDate;
+String heaterAddress;
+bool isAutoHeatEnabled = false;
+bool isHeaterEnabled = false;
+int minAutoHeaterTemp = -99;
+int maxAutoHeaterTemp = -99;
 float temperature = 0;
 float humidity = 0;
 
@@ -55,4 +61,5 @@ void loop()
   server.handleClient();
 
   CheckForSoundDetection();
+  CheckAndControllAutoHeater();
 }

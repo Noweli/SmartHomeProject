@@ -18,8 +18,8 @@ export class RoomsComponent implements OnInit {
     accountService.currentUser$.subscribe((user) => (this.currentUser = user));
   }
 
-  ngOnInit(): void {
-    this.getRooms();
+  async ngOnInit(): Promise<void> {
+    await this.getRooms();
   }
 
   async getRooms(): Promise<void> {
@@ -33,6 +33,7 @@ export class RoomsComponent implements OnInit {
         this.rooms = response;
 
         this.rooms.forEach(async (element: any) => {
+          element.editMode = false;
           await this.getRoomTemperature(element.name).then((result: any) => {
             element.temperature = result.temperature;
             element.humidity = result.humidity;
@@ -78,18 +79,41 @@ export class RoomsComponent implements OnInit {
     this.addingNewRoom = !this.addingNewRoom;
   }
 
-  toggleHeater(room: any, action: boolean): void{
+  toggleEditMode(room: any): void {
+    room.editMode = !room.editMode;
+  }
+
+  cancelEditMode(event: any): void {
+    let room = this.rooms.find((r: any) => r.id = event.id);
+    const index = this.rooms.indexOf(room);
+    room = event;
+    this.rooms[index] = room;
+    location.reload();
+  }
+
+  toggleHeater(room: any): void{
     const headers = new HttpHeaders().set(
       'Authorization',
       'Bearer ' + this.currentUser.token
     );
 
-    this.http.get(`${this.baseUrl}request/heater/${action ? 'on' : 'off'}/${room.name}`, {headers}).subscribe(response => {
+    // tslint:disable-next-line: max-line-length
+    this.http.get(`${this.baseUrl}request/heater/${room.heaterEnabled ? 'off' : 'on'}/${room.name}`, {headers, responseType: 'text'}).subscribe(() => {
       location.reload();
+    }, err =>{
+      console.warn(err);
     });
   }
 
-  getHeaterButtonText(room: any): string{
+  getEnableHeaterButtonText(room: any): string{
+    if (room.heaterEnabled){
+      return 'Turn off heater';
+    }
+
+    return 'Turn on heater';
+  }
+
+  getAutoHeaterButtonText(room: any): string{
     if(room.autoHeatEnabled){
       return 'Turn off auto heat';
     }

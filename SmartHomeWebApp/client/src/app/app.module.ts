@@ -12,6 +12,7 @@ import { SharedModule } from './_modules/shared.module';
 import { HomeComponent } from './home/home.component';
 import { RoomsComponent } from './rooms/rooms.component';
 import { AddRoomComponent } from './add-room/add-room.component';
+import { EditRoomComponent } from './edit-room/edit-room.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { AddRoomComponent } from './add-room/add-room.component';
     RegisterComponent,
     RoomsComponent,
     HomeComponent,
-    AddRoomComponent
+    AddRoomComponent,
+    EditRoomComponent
   ],
   imports: [
     BrowserModule,

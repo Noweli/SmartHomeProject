@@ -1,6 +1,6 @@
 export interface Room {
     name: string;
-    sensorIp: string;
+    sensorsIp: string;
     heaterIp: string;
     minTemp: number;
     maxtemp: number;

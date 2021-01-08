@@ -1,0 +1,28 @@
+<form #addRoomForm="ngForm" (ngSubmit)="editRoom()" autocomplete="off">
+    <h2 class="text-center text-primary float-left">Edit {{room.name}}</h2><br/><br/>
+    <div class="form-group row">
+        <div class="col-xs-4">
+            <label>Room name: </label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="room.name" placeholder="Room name">
+            <label>Sensor IP: </label>
+            <input type="text" class="form-control" name="sensorsIp" [(ngModel)]="room.sensorsIp"
+                placeholder="Room sensors IP">
+            <label>Heater IP: </label>
+            <input type="text" class="form-control" name="heaterIp" [(ngModel)]="room.heaterIp" placeholder="Heater IP">
+            <label>Minumum auto heater temperature: </label>
+            <input type="text" class="form-control" name="minTemp" [(ngModel)]="room.minTemp" placeholder="Minumum auto heater temperature">
+            <label>Maximum auto heater temperature: </label>
+            <input type="text" class="form-control" name="maxTemp" [(ngModel)]="room.maxTemp" placeholder="Maximum auto heater temperature">
+            <label>Auto heater: </label>
+            <select class="form-control" name="autoHeaterEnabled" [(ngModel)]="room.autoHeatEnabled">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group text-center container-sm float-left">
+        <button class="btn btn-success mr-2" type="submit">Edit room</button>
+        <button class="btn btn-danger mr-2" type="submit" (click)="deleteRoom()">Delete room</button>
+        <button class="btn btn-default mr-2" type="button" (click)="cancel()">Cancel</button>
+    </div>
+</form>

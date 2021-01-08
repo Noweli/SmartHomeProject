@@ -4,6 +4,9 @@ void SetUpServer(){
   server.on("/humidity", Handle_HumidityRequest);
   server.on("/sound", Handle_SoundSensorRequest);
   server.on("/light", Handle_LightSensorRequest);
+  server.on("/setAutoHeater", Handle_SetAutoHeater);
+  server.on("/turnOnAutoHeater", Handle_TurnOnAutoHeater);
+  server.on("/turnOffAutoHeater", Handle_TurnOffAutoHeater);
   server.onNotFound(Handle_NotFound);
   
   server.begin();

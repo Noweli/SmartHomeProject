@@ -15,7 +15,7 @@ namespace SmartHomeAPI.Extensions
             serviceCollection.AddScoped<ITokenService, TokenService>();
             serviceCollection.AddDbContext<DataContext>(options =>
             {
-                options.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
             
         }
