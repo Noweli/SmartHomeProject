@@ -1,11 +1,22 @@
 <ul>
-    <li *ngFor="let room of rooms"><h3 style="display: inline;">{{room.name}}</h3>
-        <br/><p style="font-size: 12px; margin-bottom: 0%;"><i>Temperature: {{room.temperature}}°C -  Humidity: {{room.humidity}}%</i></p>
-        <p *ngIf="room.heaterIp" style="font-size: 12px;"><i>Heater turned on: {{room.heaterEnabled}} -  Auto heating enabled: {{room.autoHeatEnabled}}</i></p>
-        <button class="btn btn-success" type="button">Edit</button>
-        <button class="btn btn-success ml-2" type="button" (click)="toggleHeater(room)" *ngIf="room.heaterIp">{{getEnableHeaterButtonText(room)}}</button>
-        <button class="btn btn-success ml-2" type="button" (click) ="toggleAutoHeater(room)" *ngIf="room.heaterIp">{{getAutoHeaterButtonText(room)}}</button>
-        <br/><br/><br/>
+    <li *ngFor="let room of rooms">
+        <div class="fluid-container" *ngIf="!room.editMode">
+            <h3 style="display: inline;">{{room.name}}</h3>
+            <br />
+            <p style="font-size: 12px; margin-bottom: 0%;"><i>Temperature: {{room.temperature}}°C - Humidity:
+                    {{room.humidity}}%</i></p>
+            <p *ngIf="room.heaterIp" style="font-size: 12px;"><i>Heater turned on: {{room.heaterEnabled}} - Auto heating
+                    enabled: {{room.autoHeatEnabled}}</i></p>
+            <button class="btn btn-success" type="button" (click)="toggleEditMode(room)">Edit</button>
+            <button class="btn btn-success ml-2" type="button" (click)="toggleHeater(room)"
+                *ngIf="room.heaterIp">{{getEnableHeaterButtonText(room)}}</button>
+            <button class="btn btn-success ml-2" type="button" (click)="toggleAutoHeater(room)"
+                *ngIf="room.heaterIp">{{getAutoHeaterButtonText(room)}}</button>
+        </div>
+        <div class="fluid-container" *ngIf="room.editMode">
+            <app-edit-room [room]="room" (cancelEdit)="cancelEditMode($event)"></app-edit-room>
+        </div>
+        <br /><br /><br />
     </li>
     <div class="container float-left" *ngIf="!addingNewRoom">
         <button class="btn btn-info" (click)="toggleAddingMode()">Add new room</button>

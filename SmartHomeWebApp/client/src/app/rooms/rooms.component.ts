@@ -33,6 +33,7 @@ export class RoomsComponent implements OnInit {
         this.rooms = response;
 
         this.rooms.forEach(async (element: any) => {
+          element.editMode = false;
           await this.getRoomTemperature(element.name).then((result: any) => {
             element.temperature = result.temperature;
             element.humidity = result.humidity;
@@ -76,6 +77,18 @@ export class RoomsComponent implements OnInit {
 
   toggleAddingMode(): void{
     this.addingNewRoom = !this.addingNewRoom;
+  }
+
+  toggleEditMode(room: any): void {
+    room.editMode = !room.editMode;
+  }
+
+  cancelEditMode(event: any): void {
+    let room = this.rooms.find((r: any) => r.id = event.id);
+    const index = this.rooms.indexOf(room);
+    room = event;
+    this.rooms[index] = room;
+    location.reload();
   }
 
   toggleHeater(room: any): void{

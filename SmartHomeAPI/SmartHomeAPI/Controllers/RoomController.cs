@@ -23,19 +23,24 @@ namespace SmartHomeAPI.Controllers
         [HttpGet("getRooms")]
         public ActionResult<RoomDTO[]> GetRooms()
         {
-            RoomDTO[] rooms = _context.GetUserRooms(User.GetCurrentUser()).Select(r => new RoomDTO
-            {
-                Name = r.Name,
-                HeaterIp = r.HeaterIP,
-                SensorIp = r.SensorsIP,
-                AutoHeatEnabled = r.AutoHeatEnabled,
-                Interval = r.Interval,
-                MaxTemp = r.MaxTemp,
-                MinTemp = r.MinTemp,
-                HeaterEnabled = r.HeaterEnabled
-            }).ToArray();
+            RoomDTO[] rooms = _context.GetUserRooms(User.GetCurrentUser()).Select(r => r.ConverAppRoomToRoomDTO()).ToArray();
 
             return rooms;
+        }
+        
+        [Authorize]
+        [HttpPost("edit")]
+        public async Task<ActionResult<RoomDTO>> SetHeaterConfiguration(AppRoom room)
+        {
+            if (string.IsNullOrEmpty(room.Name))
+            {
+                return BadRequest("Parameters provided incorrectly, missing name!");
+            }
+
+            _context.Rooms.Update(room);
+            await _context.SaveChangesAsync();
+
+            return room.ConverAppRoomToRoomDTO();
         }
         
         [Authorize]
@@ -62,17 +67,7 @@ namespace SmartHomeAPI.Controllers
             _context.Rooms.Update(room);
             await _context.SaveChangesAsync();
 
-            return new RoomDTO
-            {
-                Name = room.Name,
-                Interval = room.Interval,
-                MaxTemp = room.MaxTemp,
-                MinTemp = room.MinTemp,
-                AutoHeatEnabled = room.AutoHeatEnabled,
-                HeaterIp = room.HeaterIP,
-                SensorIp = room.SensorsIP,
-                HeaterEnabled = room.HeaterEnabled
-            };
+            return room.ConverAppRoomToRoomDTO();
         }
         
         [Authorize]
@@ -97,17 +92,7 @@ namespace SmartHomeAPI.Controllers
             _context.Rooms.Update(room);
             await _context.SaveChangesAsync();
 
-            return new RoomDTO
-            {
-                Name = room.Name,
-                Interval = room.Interval,
-                MaxTemp = room.MaxTemp,
-                MinTemp = room.MinTemp,
-                AutoHeatEnabled = room.AutoHeatEnabled,
-                HeaterIp = room.HeaterIP,
-                SensorIp = room.SensorsIP,
-                HeaterEnabled = room.HeaterEnabled
-            };
+            return room.ConverAppRoomToRoomDTO();
         }
         
         [Authorize]
@@ -123,7 +108,7 @@ namespace SmartHomeAPI.Controllers
             {
                 Name = roomDto.Name,
                 AppUser = User.GetCurrentUser(),
-                SensorsIP = roomDto.SensorIp,
+                SensorsIP = roomDto.SensorsIp,
                 HeaterIP = roomDto.HeaterIp
             };
 

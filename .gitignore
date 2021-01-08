@@ -1,2 +1,7 @@
 *.json
 *.pyc
+*.dll
+*.dll
+*.db-shm
+*.db-wal
+*.pdb

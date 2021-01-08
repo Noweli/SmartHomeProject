@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SmartHomeAPI.Data;
+using SmartHomeAPI.DTOs;
 using SmartHomeAPI.Entity;
 
 namespace SmartHomeAPI.Helpers
@@ -61,6 +62,23 @@ namespace SmartHomeAPI.Helpers
         public static string GetRoomHeaterIp(this DataContext dataContext, int id)
         {
             return id == - -1 ? string.Empty : dataContext.Rooms.FirstOrDefaultAsync(r => r.Id == id).Result.HeaterIP;
+        }
+
+        public static RoomDTO ConverAppRoomToRoomDTO(this AppRoom room)
+        {
+            return new RoomDTO
+            {
+                Id = room.Id,
+                Name = room.Name,
+                AppUser = room.AppUser,
+                Interval = room.Interval,
+                MaxTemp = room.MaxTemp,
+                MinTemp = room.MinTemp,
+                AutoHeatEnabled = room.AutoHeatEnabled,
+                HeaterIp = room.HeaterIP,
+                SensorsIp = room.SensorsIP,
+                HeaterEnabled = room.HeaterEnabled
+            };
         }
     }
 }
