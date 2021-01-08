@@ -13,8 +13,6 @@
             <input type="text" class="form-control" name="minTemp" [(ngModel)]="room.minTemp" placeholder="Minumum auto heater temperature">
             <label>Maximum auto heater temperature: </label>
             <input type="text" class="form-control" name="maxTemp" [(ngModel)]="room.maxTemp" placeholder="Maximum auto heater temperature">
-            <label>Interval: </label>
-            <input type="text" class="form-control" name="interval" [(ngModel)]="room.interval" placeholder="Temperature check interval">
             <label>Auto heater: </label>
             <select class="form-control" name="autoHeaterEnabled" [(ngModel)]="room.autoHeatEnabled">
                 <option value="true">Enabled</option>
@@ -24,6 +22,7 @@
     </div>
     <div class="form-group text-center container-sm float-left">
         <button class="btn btn-success mr-2" type="submit">Edit room</button>
+        <button class="btn btn-danger mr-2" type="submit" (click)="deleteRoom()">Delete room</button>
         <button class="btn btn-default mr-2" type="button" (click)="cancel()">Cancel</button>
     </div>
 </form>

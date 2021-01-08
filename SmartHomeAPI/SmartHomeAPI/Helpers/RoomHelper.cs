@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SmartHomeAPI.Data;
@@ -64,6 +65,22 @@ namespace SmartHomeAPI.Helpers
             return id == - -1 ? string.Empty : dataContext.Rooms.FirstOrDefaultAsync(r => r.Id == id).Result.HeaterIP;
         }
 
+        public static string GetHeaterParmeters(this DataContext dataContext, AppRoom room)
+        {
+            StringBuilder result = new StringBuilder("?");
+            string heaterIp = room.HeaterIP;
+            
+            if (!heaterIp.Contains("http"))
+            {
+                heaterIp = $"http://{heaterIp}/";
+            }
+
+            result.Append("minTemp=").Append(room.MinTemp).Append("&maxTemp=").Append(room.MaxTemp)
+                .Append("&heaterAddress=").Append(heaterIp);
+
+            return result.ToString();
+        }
+
         public static RoomDTO ConverAppRoomToRoomDTO(this AppRoom room)
         {
             return new RoomDTO
@@ -71,7 +88,6 @@ namespace SmartHomeAPI.Helpers
                 Id = room.Id,
                 Name = room.Name,
                 AppUser = room.AppUser,
-                Interval = room.Interval,
                 MaxTemp = room.MaxTemp,
                 MinTemp = room.MinTemp,
                 AutoHeatEnabled = room.AutoHeatEnabled,

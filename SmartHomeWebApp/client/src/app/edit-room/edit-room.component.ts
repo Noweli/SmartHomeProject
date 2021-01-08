@@ -32,6 +32,15 @@ export class EditRoomComponent implements OnInit {
     this.cancel();
   }
 
+  deleteRoom(): void {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      'Bearer ' + this.currentUser.token
+    );
+
+    this.http.post(this.baseUrl + 'room/delete', this.room, {headers}).subscribe();
+  }
+
   cancel(): void {
     this.room.editMode = false;
     this.cancelEdit.emit(this.room);

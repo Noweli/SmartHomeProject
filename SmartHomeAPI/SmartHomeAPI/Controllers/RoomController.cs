@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,8 @@ namespace SmartHomeAPI.Controllers
     public class RoomController : BaseApiController
     {
         private readonly DataContext _context;
+        private readonly HttpClient _httpClient = new HttpClient();
+        private readonly SensorRequestHelper _sensorRequestHelper = new SensorRequestHelper();
 
         public RoomController(DataContext context)
         {
@@ -30,13 +33,24 @@ namespace SmartHomeAPI.Controllers
         
         [Authorize]
         [HttpPost("edit")]
-        public async Task<ActionResult<RoomDTO>> SetHeaterConfiguration(AppRoom room)
+        public async Task<ActionResult<RoomDTO>> EditRoom(AppRoom room)
         {
             if (string.IsNullOrEmpty(room.Name))
             {
                 return BadRequest("Parameters provided incorrectly, missing name!");
             }
+            
+            await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(_context.GetRoomSensorIp(room.Id))}/setAutoHeater{_context.GetHeaterParmeters(room)}");
 
+            if (_context.GetRoomBasedOnId(room.Id).AutoHeatEnabled && !room.AutoHeatEnabled)
+            {
+                await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(_context.GetRoomSensorIp(room.Id))}/turnOffAutoHeater");
+            }
+
+            if (!_context.GetRoomBasedOnId(room.Id).AutoHeatEnabled && room.AutoHeatEnabled)
+            {
+                await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(_context.GetRoomSensorIp(room.Id))}/turnOnAutoHeater");
+            }
             _context.Rooms.Update(room);
             await _context.SaveChangesAsync();
 
@@ -44,12 +58,22 @@ namespace SmartHomeAPI.Controllers
         }
         
         [Authorize]
-        [HttpGet("setHeater")]
-        public async Task<ActionResult<RoomDTO>> SetHeaterConfiguration(string roomName, int? minTemperature, int? maxTemperature, int? interval)
+        [HttpPost("delete")]
+        public async Task<ActionResult> DeleteRoom(AppRoom room)
         {
-            if (string.IsNullOrEmpty(roomName) || minTemperature == null || maxTemperature == null || interval == null)
+            _context.Rooms.Remove(room);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Removed room with id {room.Id}");
+        }
+        
+        [Authorize]
+        [HttpGet("setHeater")]
+        public async Task<ActionResult<RoomDTO>> SetHeaterConfiguration(string roomName, int? minTemperature, int? maxTemperature)
+        {
+            if (string.IsNullOrEmpty(roomName) || minTemperature == null || maxTemperature == null)
             {
-                return BadRequest("Parameters provided incorrectly! name=[roomName]&minTemperature=[number]&maxTemperature=[number]&interval=[number]");
+                return BadRequest("Parameters provided incorrectly! name=[roomName]&minTemperature=[number]&maxTemperature=[number]");
             }
             
             var roomId = await _context.GetUserRoomIdBasedOnName(User.GetCurrentUser(), roomName);
@@ -62,7 +86,6 @@ namespace SmartHomeAPI.Controllers
             var room = _context.GetRoomBasedOnId(roomId);
             room.MaxTemp = maxTemperature.Value;
             room.MinTemp = minTemperature.Value;
-            room.Interval = interval.Value;
 
             _context.Rooms.Update(room);
             await _context.SaveChangesAsync();
@@ -72,7 +95,7 @@ namespace SmartHomeAPI.Controllers
         
         [Authorize]
         [HttpGet("enableAutoHeater")]
-        public async Task<ActionResult<RoomDTO>> Add(string roomName, bool enabled)
+        public async Task<ActionResult<RoomDTO>> EnableAutoHeater(string roomName, bool enabled)
         {
             if (string.IsNullOrEmpty(roomName))
             {
@@ -87,6 +110,33 @@ namespace SmartHomeAPI.Controllers
             }
             
             var room = _context.GetRoomBasedOnId(roomId);
+
+            if (enabled)
+            {
+                var response =
+                    await _httpClient.GetAsync(
+                        $"{_sensorRequestHelper.GetHttpUrl(_context.GetRoomSensorIp(roomId))}/turnOnAutoHeater");
+                
+                if (response.Content.ReadAsStringAsync().Result.Contains("Min and max temperature is not set!"))
+                {
+                    if (room.MinTemp == 0 && room.MaxTemp == 0)
+                    {
+                        return Problem("Min and max temp not set!");
+                    }
+                    await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(_context.GetRoomSensorIp(roomId))}/setAutoHeater{_context.GetHeaterParmeters(room)}");
+                    response = await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(_context.GetRoomSensorIp(roomId))}/turnOnAutoHeater");
+                }
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Problem($"Could not turn on auto heater on room sensors module! {response}");
+                }
+            }
+            else
+            {
+                await _httpClient.GetAsync($"{_sensorRequestHelper.GetHttpUrl(_context.GetRoomSensorIp(roomId))}/turnOffAutoHeater");
+            }
+            
             room.AutoHeatEnabled = enabled;
 
             _context.Rooms.Update(room);

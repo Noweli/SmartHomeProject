@@ -67,3 +67,6 @@ D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\
 D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Tokens.dll
 D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
 D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\System.IdentityModel.Tokens.Jwt.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.JsonPatch.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\gitsource\SmartHomeProject\SmartHomeAPI\SmartHomeAPI\bin\Debug\netcoreapp3.1\Newtonsoft.Json.Bson.dll
